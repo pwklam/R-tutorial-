@@ -1,0 +1,70 @@
+download.file("https://raw.githubusercontent.com/pwklam/R-tutorial-/main/rtutorial.csv", "rtutorial.csv")
+
+install.packages("tidyverse")
+install.packages("quanteda")
+install.packages("quanteda.textplots")
+install.packages("quanteda.textstats")
+install.packages("sysfonts")
+install.packages("showtext")
+install.packages("jiebaR")
+library(tidyverse)
+library(quanteda)
+library(quanteda.textplots)
+library(quanteda.textstats)
+mirror_r<- read_csv("rtutorial.csv")
+corpus_mirror_r <- corpus(mirror_r, text_field = "Comment")
+
+tokens_mirror_r <- tokens(corpus_mirror_r,
+                     remove_punct = TRUE,
+                     remove_numbers = TRUE,
+                     remove_url = TRUE,
+                     remove_symbols = TRUE,
+                     verbose = TRUE)
+dfm_mirror_r <- dfm(tokens_mirror_r)
+features <- topfeatures(dfm_mirror_r, 100)
+
+data.frame(list(term = names(features), frequency = unname(features))) %>% 
+  ggplot(aes(x = reorder(term,-frequency), y = frequency)) +
+  geom_point() +
+  theme_bw() +
+  labs(x = "Term", y = "Frequency") +
+  theme(axis.text.x=element_text(angle=90, hjust=1))
+customstopwords <- c("與", "年", "月", "日","係","佢","冇","其實","點")
+
+dfm_mirror_r <- dfm_remove(dfm_mirror_r, c(stopwords('chinese', source = "misc"), stopwords('english'), customstopwords))
+
+topfeatures(dfm_mirror_r, 30)
+
+textplot_wordcloud(dfm_mirror_r)
+
+library(sysfonts)
+font_add_google("Noto Sans TC", "Noto Sans TC")
+library(showtext)
+showtext_auto()
+
+textplot_wordcloud(dfm_mirror_r)
+
+text<- "姜濤 鏡中鏡"
+print(tokens(text), max_ntoken = 100)
+
+library(jiebaR)
+tokeniser <- worker()
+segment(text, tokeniser)
+edit_dict()
+raw_texts <- as.character(corpus_mirror_r) 
+tokenised_texts <- purrr::map(raw_texts, segment, tokeniser)
+
+tokens_mirror_r <- tokens(tokenised_texts, 
+                     remove_punct = TRUE,
+                     remove_numbers = TRUE,
+                     remove_url = TRUE,
+                     remove_symbols = TRUE,
+                     verbose = TRUE)
+tokens_mirror_r
+
+new_user_word(tokeniser, c("姜濤","鏡中鏡"))
+
+dfm_mirror_r <- dfm(tokens_mirror_r)
+dfm_mirror_r <- dfm_remove(dfm_mirror_r, c(stopwords('chinese', source = "misc"), stopwords('english'), customstopwords))
+topfeatures(dfm_mirror_r, 30)
+textplot_wordcloud(dfm_mirror_r)
