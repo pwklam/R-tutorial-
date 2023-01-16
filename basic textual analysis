@@ -1,3 +1,8 @@
+https://exportcomments.com/ ###export facebook comments
+https://www.facebook.com/theinitium/photos/a.497892530387304/2440499339459937
+##############################################################################
+
+
 download.file("https://raw.githubusercontent.com/pwklam/R-tutorial-/main/rtutorial.csv", "rtutorial.csv")
 
 install.packages("tidyverse")
